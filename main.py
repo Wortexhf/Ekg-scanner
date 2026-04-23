@@ -19,7 +19,6 @@ class ECGApp:
         self._build_ui()
 
     def _build_ui(self):
-        # ── Ліва панель ──
         left = tk.Frame(self.root, bg="#1e1e2e", width=220)
         left.pack(side=tk.LEFT, fill=tk.Y, padx=10, pady=10)
 
@@ -52,7 +51,6 @@ class ECGApp:
                                     state=tk.DISABLED)
         self.reset_btn.pack(fill=tk.X, pady=5)
 
-        # Статистика
         tk.Label(left, text="─── Stats ───", bg="#1e1e2e",
                  fg="#6c7086", font=("Helvetica", 9)).pack(pady=(20, 5))
 
@@ -79,7 +77,6 @@ class ECGApp:
                  fg="#f9e2af", font=("Helvetica", 9),
                  wraplength=180).pack(pady=(20, 0), anchor="w")
 
-        # ── Права панель (графік) ──
         right = tk.Frame(self.root, bg="#1e1e2e")
         right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(0, 10), pady=10)
 
