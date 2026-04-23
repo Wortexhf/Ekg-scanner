@@ -2,12 +2,12 @@ import numpy as np
 from scipy.signal import butter, lfilter, find_peaks
 
 
-def filter_ecg(signal, fs, lowcut=0.5, highcut=40, order=5 ):
-    nyquist = 0.5 * fs
+def filter_ecg(signal, fs, lowcut=0.5, highcut=40, order=5):
+    nyquist = 0.5 * fs   
     low = lowcut / nyquist
-    high = highcut / nyquist
-    b, a = butter(order, [low,high], btype='band')
-    filtered_signal = lfilter(a,b, signal)
+    high = highcut / nyquist 
+    b, a = butter(order, [low, high], btype='band') 
+    filtered_signal = lfilter(b, a, signal)
     return filtered_signal
 
 
