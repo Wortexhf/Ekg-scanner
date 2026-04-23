@@ -1,5 +1,5 @@
 # 🫀 EKG Analyzer
-
+![EKG analyzer](image.png)
 A desktop application for real-time ECG signal visualization and automatic arrhythmia classification, built with Python and Tkinter.
 
 ---
