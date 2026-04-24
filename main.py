@@ -117,12 +117,20 @@ class ECGApp:
                 text=f"Amplitude: {np.mean(data['amplitudes']):.2f} mV"))
 
             self.root.after(0, lambda: self._update_rhythm(classifications))
-            self.root.after(0, lambda: self.play_btn.config(state=tk.NORMAL))
+            self.root.after(0, lambda: self.play_btn.config(state=tk.NORMAL, text="⏸ Pause"))
             self.root.after(0, lambda: self.reset_btn.config(state=tk.NORMAL))
             self.root.after(0, lambda: self.load_btn.config(state=tk.NORMAL))
             self.root.after(0, lambda: self.status_var.set(f"Loaded: {rec_id}"))
+            # запускаємо play тільки після того як всі root.after виконались
+            self.root.after(100, self._autostart_play)
 
         threading.Thread(target=_worker, daemon=True).start()
+
+    def _autostart_play(self):
+        # малюємо всі pending події перед запуском
+        self.root.update_idletasks()
+        if not self.viz.is_playing:
+            self.viz.toggle_play(on_stop_callback=lambda: self.play_btn.config(text="▶ Play"))
 
     def _update_rhythm(self, classifications):
         for w in self.rhythm_frame.winfo_children():

@@ -60,10 +60,14 @@ def load_training_data():
             record = wfdb.rdrecord(rec_id, pn_dir='mitdb')
             ann = wfdb.rdann(rec_id, 'atr', pn_dir='mitdb')
             signal = filter_ecg(record.p_signal[:, 0], record.fs)
+            positive = signal[signal > 0]
+            threshold = np.mean(positive) + 0.3 * np.std(positive) if len(positive) > 0 else np.percentile(signal, 90)
             peaks, _ = find_peaks(
                 signal,
-                distance=int(0.6 * record.fs),
-                height=np.mean(signal) * 1.5,
+                distance=int(0.4 * record.fs),
+                height=threshold,
+                prominence=0.5,
+                wlen=int(record.fs * 0.6),
             )
             for sample, symbol in zip(ann.sample, ann.symbol):
                 if symbol not in LABEL_MAP:
