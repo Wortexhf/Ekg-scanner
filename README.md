@@ -1,5 +1,6 @@
 # 🫀 EKG Analyzer
-![EKG analyzer](image.png)
+![EKG analyzer]<img width="947" height="1026" alt="image" src="https://github.com/user-attachments/assets/9576152f-e194-4628-8815-4f33f38485f6" />
+
 A desktop application for real-time ECG signal visualization and automatic arrhythmia classification, built with Python and Tkinter.
 
 ---
