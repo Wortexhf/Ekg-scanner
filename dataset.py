@@ -1,7 +1,7 @@
 import wfdb
 
 
-LOAD_MINUTES = 1  # скільки хвилин завантажувати
+LOAD_MINUTES = 1  
 
 
 def ecg_record(record_id):
@@ -11,7 +11,6 @@ def ecg_record(record_id):
         return None, None
 
     try:
-        # спочатку читаємо header щоб дізнатись fs
         header = wfdb.rdheader(record_id, pn_dir='mitdb')
         sampto = header.fs * 60 * LOAD_MINUTES
         record = wfdb.rdrecord(record_id, pn_dir='mitdb', sampto=sampto)
