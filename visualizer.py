@@ -162,7 +162,6 @@ class ECGVisualizer:
         self.ax.set_ylim(self.signal.min() - 0.1, self.signal.max() + 0.1)
         self.ax.set_xlabel("Time (s)", color="#a6adc8")
         self.ax.set_ylabel("Amplitude (mV)", color="#a6adc8")
-        self.ax.set_title("ECG Signal — Live", color="#cdd6f4")
         self.fig.tight_layout()
         self.canvas.draw()
 

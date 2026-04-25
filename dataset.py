@@ -1,6 +1,9 @@
 import wfdb
 
 
+LOAD_MINUTES = 1  # скільки хвилин завантажувати
+
+
 def ecg_record(record_id):
     record_id = str(record_id).strip()
     if not record_id:
@@ -8,8 +11,11 @@ def ecg_record(record_id):
         return None, None
 
     try:
-        record = wfdb.rdrecord(record_id, pn_dir='mitdb')
-        ann = wfdb.rdann(record_id, 'atr', pn_dir='mitdb')
+        # спочатку читаємо header щоб дізнатись fs
+        header = wfdb.rdheader(record_id, pn_dir='mitdb')
+        sampto = header.fs * 60 * LOAD_MINUTES
+        record = wfdb.rdrecord(record_id, pn_dir='mitdb', sampto=sampto)
+        ann = wfdb.rdann(record_id, 'atr', pn_dir='mitdb', sampto=sampto)
         return record, ann
     except ValueError as e:
         print(f"Record '{record_id}' not found. Error: {e}")
