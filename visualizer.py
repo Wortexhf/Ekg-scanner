@@ -19,7 +19,7 @@ BEAT_COLORS = {
     'Paced':  '#f9e2af',
 }
 
-PAGE_SEC = 60  # 1 хвилина
+PAGE_SEC = 60  
 
 
 class ECGVisualizer:
@@ -121,7 +121,6 @@ class ECGVisualizer:
             self.is_playing = False
         else:
             self.is_playing = True
-            # не скидаємо play_pos — продовжуємо з поточного місця
             threading.Thread(target=self._play_loop,
                              args=(on_stop_callback,), daemon=True).start()
 
