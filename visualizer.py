@@ -41,6 +41,8 @@ class ECGVisualizer:
 
 
 
+
+
     def _style_ax(self):
         self.ax.set_facecolor("#181825")
         self.ax.tick_params(colors="#a6adc8")
@@ -52,33 +54,25 @@ class ECGVisualizer:
         return max(1, int(np.ceil(len(self.signal) / self.fs / PAGE_SEC)))
 
     def _update_nav(self):
-        total   = self._total_pages()
-        start_s = self.page * PAGE_SEC
-        end_s   = min(start_s + PAGE_SEC, len(self.signal) / self.fs)
-        self.page_label.config(
-            text=f"{int(start_s//60)}:{int(start_s%60):02d} – {int(end_s//60)}:{int(end_s%60):02d}   |   {self.page+1} / {total}"
-        )
-        self.prev_btn.config(state=tk.NORMAL if self.page > 0 else tk.DISABLED)
-        self.next_btn.config(state=tk.NORMAL if self.page < total - 1 else tk.DISABLED)
+        pass  # navigation buttons removed
 
     def _prev_page(self):
         self.page -= 1
-        self._update_nav()
         self._draw_page()
 
     def _next_page(self):
         self.page += 1
-        self._update_nav()
         self._draw_page()
 
     def load(self, signal, fs, peaks, classifications):
+        # Stop old playback thread before replacing data
+        self.is_playing = False
         self.signal = signal
         self.fs = fs
         self.peaks = peaks
         self.classifications = dict(classifications)
         self.page = 0
         self.play_pos = 0
-        self.is_playing = False
         self._update_nav()
         self._draw_page()
 
@@ -171,3 +165,15 @@ class ECGVisualizer:
         if self.signal is not None:
             self._update_nav()
             self._draw_page()
+
+    def scrub(self, direction):
+        """Move play_pos by 6s forward or backward and redraw. Only when paused."""
+        if self.signal is None or self.is_playing:
+            return
+        step = int(self.fs * 6)
+        self.play_pos = max(0, min(self.play_pos + direction * step,
+                                   len(self.signal) - int(self.fs * 6)))
+        s = self.play_pos
+        e = min(s + int(self.fs * 6), len(self.signal))
+        pk = self.peaks[(self.peaks >= s) & (self.peaks < e)]
+        self._draw_window(s, e, pk)

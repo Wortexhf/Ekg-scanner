@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 from collections import Counter
 import numpy as np
 import threading
@@ -8,6 +8,14 @@ from dataset import ecg_record
 from signal_processing import filter_ecg, extracted_features
 from classifier import classify_signal
 from visualizer import ECGVisualizer
+
+VALID_RECORDS = [
+    '100','101','102','103','104','105','106','107','108','109',
+    '111','112','113','114','115','116','117','118','119','121',
+    '122','123','124','200','201','202','203','205','207','208',
+    '209','210','212','213','214','215','217','219','220','221',
+    '222','223','228','230','231','232','233','234'
+]
 
 
 class ECGApp:
@@ -25,13 +33,22 @@ class ECGApp:
         tk.Label(left, text="EKG Analyzer", bg="#1e1e2e", fg="#cdd6f4",
                  font=("Helvetica", 16, "bold")).pack(pady=(10, 20))
 
-        tk.Label(left, text="Record ID (100-234):", bg="#1e1e2e",
+        tk.Label(left, text="Record ID:", bg="#1e1e2e",
                  fg="#a6adc8", font=("Helvetica", 10)).pack(anchor="w")
 
-        self.record_entry = tk.Entry(left, font=("Helvetica", 12), width=10,
-                                     bg="#313244", fg="#cdd6f4",
-                                     insertbackground="white", relief="flat")
-        self.record_entry.insert(0, "100")
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure("Dark.TCombobox",
+                        fieldbackground="#313244", background="#313244",
+                        foreground="#cdd6f4", selectbackground="#45475a",
+                        selectforeground="#cdd6f4", arrowcolor="#cdd6f4")
+
+        self.record_var = tk.StringVar(value="100")
+        self.record_entry = ttk.Combobox(left, textvariable=self.record_var,
+                                          values=VALID_RECORDS, width=9,
+                                          font=("Helvetica", 12),
+                                          style="Dark.TCombobox",
+                                          state="readonly")
         self.record_entry.pack(pady=5, ipady=4)
 
         self.load_btn = tk.Button(left, text="⬇ Load", font=("Helvetica", 11),
@@ -51,6 +68,24 @@ class ECGApp:
                                     state=tk.DISABLED)
         self.reset_btn.pack(fill=tk.X, pady=5)
 
+        tk.Label(left, text="─── Scrub ───", bg="#1e1e2e",
+                 fg="#6c7086", font=("Helvetica", 9)).pack(pady=(10, 4))
+
+        scrub_frame = tk.Frame(left, bg="#1e1e2e")
+        scrub_frame.pack(fill=tk.X)
+
+        self.prev_btn = tk.Button(scrub_frame, text="◀", font=("Helvetica", 13),
+                                   bg="#313244", fg="#cdd6f4", relief="flat",
+                                   cursor="hand2", command=self._scrub_back,
+                                   state=tk.DISABLED)
+        self.prev_btn.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=(0, 2))
+
+        self.next_btn = tk.Button(scrub_frame, text="▶", font=("Helvetica", 13),
+                                   bg="#313244", fg="#cdd6f4", relief="flat",
+                                   cursor="hand2", command=self._scrub_forward,
+                                   state=tk.DISABLED)
+        self.next_btn.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=(2, 0))
+
         tk.Label(left, text="─── Stats ───", bg="#1e1e2e",
                  fg="#6c7086", font=("Helvetica", 9)).pack(pady=(20, 5))
 
@@ -65,6 +100,10 @@ class ECGApp:
         self.stat_amp = tk.Label(left, text="Amplitude: —", bg="#1e1e2e",
                                   fg="#cdd6f4", font=("Helvetica", 10))
         self.stat_amp.pack(anchor="w")
+        self.status_var = tk.StringVar(value="Ready")
+        tk.Label(left, textvariable=self.status_var, bg="#1e1e2e",
+                 fg="#f9e2af", font=("Helvetica", 9),
+                 wraplength=180).pack(pady=(20, 0), anchor="w")
 
         tk.Label(left, text="─── Rhythm ───", bg="#1e1e2e",
                  fg="#6c7086", font=("Helvetica", 9)).pack(pady=(20, 5))
@@ -72,10 +111,19 @@ class ECGApp:
         self.rhythm_frame = tk.Frame(left, bg="#1e1e2e")
         self.rhythm_frame.pack(fill=tk.X)
 
-        self.status_var = tk.StringVar(value="Ready")
-        tk.Label(left, textvariable=self.status_var, bg="#1e1e2e",
-                 fg="#f9e2af", font=("Helvetica", 9),
-                 wraplength=180).pack(pady=(20, 0), anchor="w")
+        tk.Label(left, text="─── Help ───", bg="#1e1e2e",
+                 fg="#6c7086", font=("Helvetica", 10)).pack(pady=(330, 5))
+        legend_text = (
+            "Normal: Normal beat\n"
+            "PVC: Premature ventricular contraction\n"
+            "APC: Premature atrial contraction\n"
+            "LBBB: Left bundle branch block\n"
+            "RBBB: Right bundle branch block\n"
+            "Paced: Paced beat\n"
+        )
+        tk.Label(left, text=legend_text, bg="#1e1e2e",
+                 fg="#a6adc8", font=("Helvetica", 10),
+                 justify=tk.LEFT).pack(anchor="w")
 
         right = tk.Frame(self.root, bg="#1e1e2e")
         right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(0, 10), pady=10)
@@ -83,11 +131,15 @@ class ECGApp:
         self.viz = ECGVisualizer(right)
 
     def _load_record(self):
-        rec_id = self.record_entry.get().strip()
+        rec_id = self.record_var.get().strip()
         if not rec_id:
             messagebox.showerror("Error", "Enter record ID!")
             return
 
+        if self.viz.is_playing:
+            self.viz.is_playing = False
+
+        self.play_btn.config(text="▶ Play")
         self.status_var.set("Loading...")
         self.load_btn.config(state=tk.DISABLED)
 
@@ -119,6 +171,8 @@ class ECGApp:
             self.root.after(0, lambda: self._update_rhythm(classifications))
             self.root.after(0, lambda: self.play_btn.config(state=tk.NORMAL, text="⏸ Pause"))
             self.root.after(0, lambda: self.reset_btn.config(state=tk.NORMAL))
+            self.root.after(0, lambda: self.prev_btn.config(state=tk.NORMAL))
+            self.root.after(0, lambda: self.next_btn.config(state=tk.NORMAL))
             self.root.after(0, lambda: self.load_btn.config(state=tk.NORMAL))
             self.root.after(0, lambda: self.status_var.set(f"Loaded: {rec_id}"))
             self.root.after(100, self._autostart_play)
@@ -153,6 +207,14 @@ class ECGApp:
         else:
             self.viz.toggle_play(on_stop_callback=lambda: self.play_btn.config(text="▶ Play"))
             self.play_btn.config(text="⏸ Pause")
+
+    def _scrub_back(self):
+        if not self.viz.is_playing:
+            self.viz.scrub(-1)
+
+    def _scrub_forward(self):
+        if not self.viz.is_playing:
+            self.viz.scrub(+1)
 
     def _reset(self):
         self.viz.reset()

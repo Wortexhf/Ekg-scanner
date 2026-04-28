@@ -1,9 +1,5 @@
 import wfdb
 
-
-LOAD_MINUTES = 1  
-
-
 def ecg_record(record_id):
     record_id = str(record_id).strip()
     if not record_id:
@@ -12,7 +8,7 @@ def ecg_record(record_id):
 
     try:
         header = wfdb.rdheader(record_id, pn_dir='mitdb')
-        sampto = header.fs * 60 * LOAD_MINUTES
+        sampto = header.fs * 60 
         record = wfdb.rdrecord(record_id, pn_dir='mitdb', sampto=sampto)
         ann = wfdb.rdann(record_id, 'atr', pn_dir='mitdb', sampto=sampto)
         return record, ann
