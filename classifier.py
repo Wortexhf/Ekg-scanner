@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
 import os
+from signal_processing import filter_ecg
 
 TRAIN_RECORDS = [
     '100', '101', '102', '103', '104',
@@ -25,11 +26,6 @@ LABEL_MAP = {
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, 'ecg_model.pkl')
 LE_PATH = os.path.join(BASE_DIR, 'label_encoder.pkl')
-
-def filter_ecg(signal, fs, lowcut=0.5, highcut=40, order=5):
-    nyquist = 0.5 * fs
-    b, a = butter(order, [lowcut / nyquist, highcut / nyquist], btype='band')
-    return lfilter(b, a, signal)
 
 
 def extract_beat_features(signal, fs, peak_idx, all_peaks):

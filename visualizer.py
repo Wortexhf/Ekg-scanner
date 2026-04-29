@@ -53,9 +53,6 @@ class ECGVisualizer:
             return 1
         return max(1, int(np.ceil(len(self.signal) / self.fs / PAGE_SEC)))
 
-    def _update_nav(self):
-        pass  
-
     def _prev_page(self):
         self.page -= 1
         self._draw_page()
@@ -162,7 +159,6 @@ class ECGVisualizer:
         self.play_pos = 0
         self.page = 0
         if self.signal is not None:
-            self._update_nav()
             self._draw_page()
 
     def scrub(self, direction):
