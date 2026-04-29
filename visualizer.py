@@ -7,7 +7,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from collections import defaultdict
 import threading
 import time
-import tkinter as tk
+
 
 
 BEAT_COLORS = {
@@ -54,7 +54,7 @@ class ECGVisualizer:
         return max(1, int(np.ceil(len(self.signal) / self.fs / PAGE_SEC)))
 
     def _update_nav(self):
-        pass  # navigation buttons removed
+        pass  
 
     def _prev_page(self):
         self.page -= 1
@@ -65,7 +65,6 @@ class ECGVisualizer:
         self._draw_page()
 
     def load(self, signal, fs, peaks, classifications):
-        # Stop old playback thread before replacing data
         self.is_playing = False
         self.signal = signal
         self.fs = fs

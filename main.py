@@ -112,7 +112,7 @@ class ECGApp:
         self.rhythm_frame.pack(fill=tk.X)
 
         tk.Label(left, text="─── Help ───", bg="#1e1e2e",
-                 fg="#6c7086", font=("Helvetica", 10)).pack(pady=(330, 5))
+                 fg="#6c7086", font=("Helvetica", 10)).pack(pady=(325, 5))
         legend_text = (
             "Normal: Normal beat\n"
             "PVC: Premature ventricular contraction\n"

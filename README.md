@@ -77,7 +77,7 @@ python main.py
 ## How It Works
 
 ### Signal Loading
-Only the **first minute** of each record is loaded (`LOAD_MINUTES = 1`) to keep startup fast. The record is streamed on demand from PhysioNet via `wfdb` — no local dataset download required.
+Only the **first minute** of each record is loaded to keep startup fast. The record is streamed on demand from PhysioNet via `wfdb` — no local dataset download required.
 
 ### Signal Processing
 Raw ECG is filtered with a 5th-order Butterworth bandpass filter (0.5–40 Hz). R-peaks are detected using `scipy.find_peaks` with:
