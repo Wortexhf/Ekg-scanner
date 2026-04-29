@@ -68,9 +68,6 @@ class ECGApp:
                                     state=tk.DISABLED)
         self.reset_btn.pack(fill=tk.X, pady=5)
 
-        tk.Label(left, text="─── Scrub ───", bg="#1e1e2e",
-                 fg="#6c7086", font=("Helvetica", 9)).pack(pady=(10, 4))
-
         scrub_frame = tk.Frame(left, bg="#1e1e2e")
         scrub_frame.pack(fill=tk.X)
 
