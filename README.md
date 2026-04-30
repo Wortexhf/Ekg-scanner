@@ -3,8 +3,8 @@
 A desktop application for real-time ECG signal visualization and automatic arrhythmia classification, built with Python and Tkinter.
 <img width="947" height="1026" alt="image" src="https://github.com/user-attachments/assets/9576152f-e194-4628-8815-4f33f38485f6" />
 
-# Documentation
-[#DOcumentation](https://github.com/user-attachments/files/27218961/EKG_Artem_verkhola.docx)
+#
+[Documentation](https://github.com/user-attachments/files/27218961/EKG_Artem_verkhola.docx)
 ---
 
 ## Features
