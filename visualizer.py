@@ -162,7 +162,6 @@ class ECGVisualizer:
             self._draw_page()
 
     def scrub(self, direction):
-        """Move play_pos by 6s forward or backward and redraw. Only when paused."""
         if self.signal is None or self.is_playing:
             return
         step = int(self.fs * 6)
